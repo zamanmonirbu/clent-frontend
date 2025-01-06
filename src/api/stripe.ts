@@ -1,48 +1,188 @@
-import { loadStripe } from "@stripe/stripe-js";
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 
-const public_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-const BASE_URL = "http://localhost:5000";
+export const useStripeCheckout = () => {
+  const BASE_URL="http://localhost:5000";
+  const stripe = useStripe();
+  const elements = useElements();
 
-export async function createCheckoutSession(items) {
-  console.log("Items:", items);
-  try {
-    const stripe = await loadStripe(public_key);
+  const createPaymentIntent = async (items) => {
+    console.log(items);
+    try {
+      const response = await fetch(`${BASE_URL}/api/payment/create-payment-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
 
-    const body = items.map(item => ({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: item.name,
-          images: [item.image], 
-        },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
+      if (!response.ok) throw new Error('Failed to create payment intent.');
+
+      const { client_secret } = await response.json();
+      return client_secret;
+    } catch (error) {
+      console.error('Error creating payment intent:', error.message);
+      throw error;
+    }
+  };
+
+  const handlePayment = async (items) => {
+    if (!stripe || !elements) {
+      throw new Error('Stripe has not loaded properly.');
+    }
+
+    console.log(items);
+
+    const clientSecret = await createPaymentIntent(items);
+    const cardElement = elements.getElement(CardElement);
+
+    if (!cardElement) {
+      throw new Error('Card Element not found.');
+    }
+
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardElement,
       },
-      quantity: item.quantity,
-    }));
-
-
-    const response = await fetch(`${BASE_URL}/api/payment/create-checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ products: body }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to create Stripe session");
+    if (error) {
+      console.error('Payment failed:', error.message);
+      throw error;
     }
 
-    const session = await response.json();
-    const result = await stripe?.redirectToCheckout({ sessionId: session.id });
+    return paymentIntent;
+  };
 
-    if (result?.error) {
-      console.error("Stripe redirectToCheckout error:", result.error.message);
-    }
-  } catch (error) {
-    console.error("Payment error:", error.message);
-  }
-}
+  return { handlePayment };
+};
+
+
+// import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+
+
+// export async function createCheckoutSession(items) {
+//   // const elements = useElements();
+//   const stripe = useStripe()
+
+
+// // const handleSubmit = async (e: React.FormEvent) => {
+//   // e.preventDefault()
+
+//   // if (!stripe || !elements) {
+//   //   setPaymentStatus('Stripe is not loaded.')
+//   //   return
+//   // }
+
+//   // const card = elements.getElement(CardElement)
+//   // if (!card) {
+//   //   setPaymentStatus('Card Element not found.')
+//   //   return
+//   // }
+
+
+
+//       const body = items.map(item => ({
+//         price_data: {
+//           currency: 'eur',
+//           product_data: {
+//             name: item.name,
+//             images: [item.image], 
+//           },
+//           unit_amount: Math.round(item.price * 100), // Convert to cents
+//         },
+//         quantity: item.quantity,
+//       }));
+  
+
+//   try {
+//     const response = await fetch(
+//       'http://localhost:3001/api/payment/create-payment-intent',
+//       {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ products: body }),
+//       }
+//     )
+
+//     if (!response.ok) {
+//       throw new Error('Failed to create payment intent.')
+//     }
+
+//     const { client_secret } = await response.json()
+
+//     // Step 2: Confirm the PaymentIntent with the client secret
+//     const { error, paymentIntent } = await stripe.confirmCardPayment(
+//       client_secret,
+//       {
+//         payment_method: { card },
+//       }
+//     )
+
+//     if (error) {
+//       console.log(error.message || 'Payment failed.')
+//     } else if (paymentIntent?.status === 'succeeded') {
+//       console.log('Payment successful!')
+//     }
+//   } catch (err) {
+//     console.log('An unexpected error occurred.')
+//   }
+// }
+
+
+
+
+
+// import { loadStripe } from "@stripe/stripe-js";
+
+// const public_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+// const BASE_URL = "http://localhost:5000";
+
+// export async function createCheckoutSession(items) {
+//   console.log("Items:", items);
+//   try {
+//     const stripe = await loadStripe(public_key);
+
+//     const body = items.map(item => ({
+//       price_data: {
+//         currency: 'eur',
+//         product_data: {
+//           name: item.name,
+//           images: [item.image], 
+//         },
+//         unit_amount: Math.round(item.price * 100), // Convert to cents
+//       },
+//       quantity: item.quantity,
+//     }));
+
+
+//     const response = await fetch(`${BASE_URL}/api/payment/create-checkout-session`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ products: body }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to create Stripe session");
+//     }
+
+//     const session = await response.json();
+//     const result = await stripe?.redirectToCheckout({ sessionId: session.id });
+
+//     if (result?.error) {
+//       console.error("Stripe redirectToCheckout error:", result.error.message);
+//     }
+//   } catch (error) {
+//     console.error("Payment error:", error.message);
+//   }
+// }
+
+
+
+
+
 
 
 // import Stripe from 'stripe';

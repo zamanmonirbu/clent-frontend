@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
 import { Button } from '../ui/Button';
 import { useCart } from '../../hooks/useCart';
-import { createCheckoutSession } from '../../api/stripe';
+import { useStripeCheckout } from '../../api/stripe';
 
 interface StripeCheckoutProps {
   onSuccess?: () => void;
@@ -12,28 +12,29 @@ interface StripeCheckoutProps {
 export function StripeCheckout({ onSuccess, onError }: StripeCheckoutProps) {
   const stripe = useStripe();
   const { items } = useCart();
+  const { handlePayment } = useStripeCheckout(); // Destructure `handlePayment` from the hook
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async () => {
-    if (!stripe) return;
+    if (!stripe) {
+      onError?.('Stripe has not loaded properly.');
+      return;
+    }
 
     try {
       setIsLoading(true);
 
-      // Create Stripe checkout session
-      const session = await createCheckoutSession(items);
+      // Handle payment through the hook
+      const paymentIntent = await handlePayment(items);
 
-      // Redirect to Stripe Checkout
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.id
-      });
-
-      if (result.error) {
-        onError?.(result.error.message);
+      if (paymentIntent.status === 'succeeded') {
+        onSuccess?.();
+      } else {
+        throw new Error('Payment did not succeed.');
       }
-    } catch (err) {
-      const error = err as Error;
-      onError?.(error.message);
+    } catch (error) {
+      const err = error as Error;
+      onError?.(err.message || 'An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
