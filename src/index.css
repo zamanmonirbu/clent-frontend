@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes blob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -30px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.9); }
+  75% { transform: translate(30px, 30px) scale(1.2); }
+}
+
+@keyframes blob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-30px, 20px) scale(1.2); }
+  50% { transform: translate(20px, -20px) scale(0.8); }
+  75% { transform: translate(-20px, -30px) scale(1.1); }
+}
+
+@keyframes blob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-20px, 30px) scale(0.9); }
+  50% { transform: translate(30px, -20px) scale(1.1); }
+  75% { transform: translate(20px, 20px) scale(1); }
+}
+
+@keyframes blob4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-30px, 30px) scale(0.9); }
+  75% { transform: translate(20px, -30px) scale(1.2); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-blob1 { animation: blob1 20s infinite; }
+.animate-blob2 { animation: blob2 25s infinite; }
+.animate-blob3 { animation: blob3 30s infinite; }
+.animate-blob4 { animation: blob4 35s infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-gradient { 
+  animation: gradient 8s linear infinite;
+  background-size: 200% 200%;
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+.animate-fadeInDelay {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.3s forwards;
+}
+.animate-fadeInDelay2 {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.6s forwards;
+}
