@@ -14,9 +14,9 @@ export function FastCheckoutButtons() {
       <Button
         variant="outline"
         className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white border-black"
-        onClick={() => {
-          console.log("Apple Pay logic can go here.");
-        }}
+        onClick={
+          handleStripeCheckout
+        }
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
           <path d="M17.0425 7.19086C16.6431 7.67708 15.9197 8.06308 15.1964 7.99474C15.1148 7.22672 15.4733 6.41224 15.8318 5.9602C16.2719 5.41474 17.0425 5.06496 17.6843 5.02869C17.7659 5.83144 17.4482 6.6459 17.0425 7.19086Z" />
