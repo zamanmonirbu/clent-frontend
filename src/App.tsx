@@ -111,13 +111,14 @@ export default function App() {
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route
-              path="/checkout"
+              path="/pay/checkout"
               element={
                 <Elements stripe={stripePromise}>
                   <Checkout />
                 </Elements>
               }
             />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/sell" element={<SellToUs />} />
             <Route path="/blog" element={<BlogPage />} />
