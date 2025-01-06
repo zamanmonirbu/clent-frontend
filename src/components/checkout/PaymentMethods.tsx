@@ -6,6 +6,7 @@ import { usePayment } from '../../hooks/usePayment';
 import { IdealBankSelector } from './IdealBankSelector';
 import { FastCheckoutButtons } from './FastCheckoutButtons';
 import { StripeCheckout } from '../payment/StripeCheckout';
+import { useNavigate } from 'react-router-dom';
 
 interface PaymentMethodsProps {
   onBack: () => void;
@@ -18,6 +19,13 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
   const [selectedBank, setSelectedBank] = useState('');
   const [cardInfo, setCardInfo] = useState({ number: '', expiry: '', cvc: '' });
   const { clientSecret, isLoading, error, initializePayment } = usePayment();
+
+    const navigate = useNavigate();
+  
+    const handleStripeCheckout = () => {
+      navigate("/pay/checkout");
+    };
+  
 
   const handleMethodSelect = async (method: 'card' | 'ideal') => {
     setSelectedMethod(method);
@@ -64,7 +72,7 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
 
       <div className="space-y-4">
         {/* Credit Card Option */}
-        <button
+        {/* <button
           onClick={() => handleMethodSelect('card')}
           className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
             selectedMethod === 'card'
@@ -76,7 +84,22 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
             <CreditCard className="w-6 h-6 text-gray-600" />
             <span className="font-medium">Credit Card</span>
           </div>
-        </button>
+        </button> */}
+
+<button
+  onClick={() => handleStripeCheckout()}
+  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+    selectedMethod === 'card'
+      ? 'border-emerald-500 bg-emerald-50'
+      : 'border-gray-200 hover:border-emerald-200'
+  }`}
+>
+  <div className="flex items-center gap-3">
+    <CreditCard className="w-6 h-6 text-gray-600" />
+    <span className="font-medium">Credit Card</span>
+  </div>
+</button>
+ 
 
         {/* iDEAL Option */}
         <button

@@ -1,7 +1,9 @@
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 
 export const useStripeCheckout = () => {
-  const BASE_URL="http://localhost:5000";
+  // const BASE_URL="http://localhost:5000";
+  const BASE_URL="https://client-lna3.onrender.com";
+
   const stripe = useStripe();
   const elements = useElements();
 
