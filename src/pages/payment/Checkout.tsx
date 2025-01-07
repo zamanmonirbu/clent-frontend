@@ -7,10 +7,9 @@ import {
   CardCvcElement,
 } from "@stripe/react-stripe-js";
 import Swal from "sweetalert2";
-import { FaCcVisa, FaCcMastercard, FaCcAmex, FaCcDiscover } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
-import CheckoutDetails from "../../components/checkout/CheckoutDetails";
+import cart from '../../components/image/paymnt.png'
 
 const Checkout = () => {
   const { items } = useCart();
@@ -28,7 +27,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/payment/create-payment-intent", {
+      const response = await fetch("http://localhost:3000/api/payment/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
@@ -58,22 +57,15 @@ const Checkout = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="flex w-full max-w-4xl gap-6">
-        {/* CheckoutDetails */}
-        <div className="w-1/2 bg-white rounded-lg shadow-lg p-6">
-          <CheckoutDetails />
-        </div>
-
+    <div className="flex flex-col items-center justify-center bg-gray-100">
+      <div className="flex w-full max-w-full gap-6">
         {/* Payment Form */}
         <form
           onSubmit={handleSubmit}
-          className="w-1/2 bg-white rounded-lg shadow-lg p-6 flex flex-col"
+          className="w-full bg-white rounded-lg shadow-lg p-6 flex flex-col"
         >
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">Payment Information</h2>
-
           {/* Name on Card */}
-          <label className="block mb-4">
+          <label className="block ">
             <span className="block text-sm font-medium text-gray-700 mb-2">
               Name on Card
             </span>
@@ -87,13 +79,7 @@ const Checkout = () => {
             />
           </label>
 
-          {/* Payment Icons */}
-          <div className="flex mt-2 space-x-4 text-gray-600">
-            <FaCcVisa size={40} className="text-blue-600" />
-            <FaCcMastercard size={40} className="text-red-600" />
-            <FaCcAmex size={40} className="text-green-600" />
-            <FaCcDiscover size={40} className="text-orange-600" />
-          </div>
+         
 
           {/* Card Number */}
           <label className="block mb-4 mt-6">
@@ -115,57 +101,68 @@ const Checkout = () => {
                 }}
               />
             </div>
+             {/* Payment Image */}
+          <div className="flex justify-start">
+            <img
+              src={cart} // Replace with your image URL
+              alt="Payment Methods"
+              className="h-10"
+            />
+          </div>
           </label>
 
-          {/* Expiry Date */}
-          <label className="block mb-4">
-            <span className="block text-sm font-medium text-gray-700 mb-2">
-              Expiry Date (MM/YY)
-            </span>
-            <div className="border border-gray-300 rounded-md p-2">
-              <CardExpiryElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: "16px",
-                      color: "#424770",
-                      letterSpacing: "0.025em",
-                      "::placeholder": { color: "#a0aec0" },
+          {/* Expiry Date and CVC in two columns */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Expiry Date */}
+            <label className="block">
+              <span className="block text-sm font-medium text-gray-700 mb-2">
+                Expiry Date (MM/YY)
+              </span>
+              <div className="border border-gray-300 rounded-md p-2">
+                <CardExpiryElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: "16px",
+                        color: "#424770",
+                        letterSpacing: "0.025em",
+                        "::placeholder": { color: "#a0aec0" },
+                      },
+                      invalid: { color: "#e74c3c" },
                     },
-                    invalid: { color: "#e74c3c" },
-                  },
-                }}
-              />
-            </div>
-          </label>
+                  }}
+                />
+              </div>
+            </label>
 
-          {/* CVC */}
-          <label className="block mb-4">
-            <span className="block text-sm font-medium text-gray-700 mb-2">
-              CVC
-            </span>
-            <div className="border border-gray-300 rounded-md p-2">
-              <CardCvcElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: "16px",
-                      color: "#424770",
-                      letterSpacing: "0.025em",
-                      "::placeholder": { color: "#a0aec0" },
+            {/* CVC */}
+            <label className="block">
+              <span className="block text-sm font-medium text-gray-700 mb-2">
+                CVC
+              </span>
+              <div className="border border-gray-300 rounded-md p-2">
+                <CardCvcElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: "16px",
+                        color: "#424770",
+                        letterSpacing: "0.025em",
+                        "::placeholder": { color: "#a0aec0" },
+                      },
+                      invalid: { color: "#e74c3c" },
                     },
-                    invalid: { color: "#e74c3c" },
-                  },
-                }}
-              />
-            </div>
-          </label>
+                  }}
+                />
+              </div>
+            </label>
+          </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading || !stripe}
-            className="w-full mt-6 py-3 bg-gray-600 hover:bg-black text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
+            className="w-full mt-6 py-3 bg-green-400 hover:bg-green-600 text-white font-bold rounded-lg  transition duration-200 shadow-md"
           >
             {loading ? "Processing..." : "Pay Now"}
           </button>

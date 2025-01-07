@@ -1,41 +1,37 @@
-import { useState } from 'react';
-import { CreditCard, Building2 } from 'lucide-react';
-import { Button } from '../ui/Button';
-import { usePayment } from '../../hooks/usePayment';
-import { IdealBankSelector } from './IdealBankSelector';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { CreditCard, Building2 } from "lucide-react";
+import { Button } from "../ui/Button";
+import { usePayment } from "../../hooks/usePayment";
+import { IdealBankSelector } from "./IdealBankSelector";
+import Checkout from "../../pages/payment/Checkout";
 
 interface PaymentMethodsProps {
   onBack: () => void;
-  onNext: () => void;
 }
 
 export function PaymentMethods({ onBack }: PaymentMethodsProps) {
-  const [selectedMethod, setSelectedMethod] = useState<'card' | 'ideal' | ''>('');
-  const [selectedBank, setSelectedBank] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState<"card" | "ideal" | "">(
+    ""
+  ); // Payment method state
+  const [selectedBank, setSelectedBank] = useState(""); // Bank selection for iDEAL
   const { initializePayment, isLoading, error } = usePayment();
-  const navigate = useNavigate(); // For navigation
 
-  const handleMethodSelect = (method: 'card' | 'ideal') => {
+  // Handle payment method selection
+  const handleMethodSelect = (method: "card" | "ideal") => {
     setSelectedMethod(method);
   };
 
+  // Handle form submission
   const handleSubmit = async () => {
     if (!selectedMethod) return;
 
-    if (selectedMethod === 'ideal' && selectedBank) {
+    if (selectedMethod === "ideal" && selectedBank) {
       try {
-        // Initialize iDEAL payment with Stripe
-        const { paymentUrl } = await initializePayment('ideal', selectedBank);
-
-        // Redirect to Stripe's hosted payment page
+        const { paymentUrl } = await initializePayment("ideal", selectedBank);
         window.location.href = paymentUrl;
       } catch (err) {
-        console.error('Payment initialization failed:', err);
+        console.error("Payment initialization failed:", err);
       }
-    } else if (selectedMethod === 'card') {
-      // Redirect to '/pay/checkout' for credit card payment
-      navigate('/pay/checkout');
     }
   };
 
@@ -44,30 +40,41 @@ export function PaymentMethods({ onBack }: PaymentMethodsProps) {
       <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
 
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700">Select Payment Method</h3>
+        <h3 className="text-sm font-medium text-gray-700">
+          Select Payment Method
+        </h3>
 
         {/* Credit Card Option */}
-        <button
-          onClick={() => handleMethodSelect('card')}
-          className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-            selectedMethod === 'card'
-              ? 'border-emerald-500 bg-emerald-50'
-              : 'border-gray-200 hover:border-emerald-200'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <CreditCard className="w-6 h-6 text-gray-600" />
-            <span className="font-medium">Credit Card</span>
-          </div>
-        </button>
+        <div>
+          <button
+            onClick={() => handleMethodSelect("card")}
+            className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+              selectedMethod === "card"
+                ? "border-emerald-500 bg-emerald-50"
+                : "border-gray-200 hover:border-emerald-200"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <CreditCard className="w-6 h-6 text-gray-600" />
+              <span className="font-medium">Credit Card</span>
+            </div>
+          </button>
+
+          {/* Show Checkout form if "Credit Card" is selected */}
+          {selectedMethod === "card" && (
+            <div className="mt-4">
+              <Checkout />
+            </div>
+          )}
+        </div>
 
         {/* iDEAL Option */}
         <button
-          onClick={() => handleMethodSelect('ideal')}
+          onClick={() => handleMethodSelect("ideal")}
           className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-            selectedMethod === 'ideal'
-              ? 'border-emerald-500 bg-emerald-50'
-              : 'border-gray-200 hover:border-emerald-200'
+            selectedMethod === "ideal"
+              ? "border-emerald-500 bg-emerald-50"
+              : "border-gray-200 hover:border-emerald-200"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -77,7 +84,7 @@ export function PaymentMethods({ onBack }: PaymentMethodsProps) {
         </button>
       </div>
 
-      {selectedMethod === 'ideal' && (
+      {selectedMethod === "ideal" && (
         <IdealBankSelector
           selectedBank={selectedBank}
           onBankSelect={setSelectedBank}
@@ -88,20 +95,25 @@ export function PaymentMethods({ onBack }: PaymentMethodsProps) {
         <div className="p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>
       )}
 
-      <div className="flex gap-4 pt-6">
-        <Button variant="outline" onClick={onBack} className="flex-1">
-          Back
-        </Button>
-        <Button
-          variant="primary"
-          onClick={handleSubmit}
-          disabled={!selectedMethod || (selectedMethod === 'ideal' && !selectedBank)}
-          loading={isLoading}
-          className="flex-1"
-        >
-          Continue
-        </Button>
-      </div>
+<div className="flex gap-4 pt-6">
+  <Button variant="outline" onClick={onBack} className="flex-1">
+    Back
+  </Button>
+  <Button
+    variant="primary"
+    onClick={handleSubmit}
+    disabled={
+      !selectedMethod || // Disable if no payment method is selected
+      (selectedMethod === "ideal" && !selectedBank) || // Disable for iDEAL if no bank is selected
+      selectedMethod === "card" // Disable for Credit Card always
+    }
+    loading={isLoading} // Show loading state when processing
+    className="flex-1"
+  >
+    Continue
+  </Button>
+</div>
+
     </div>
   );
 }

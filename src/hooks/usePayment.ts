@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCart } from "./useCart";
-
+import {BASE_URL} from '../api/baseUrl'
 export function usePayment() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +16,7 @@ export function usePayment() {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/payment/initialize', {
+      const response = await fetch(`${BASE_URL}/api/payment/initialize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({dataPass,items}),
