@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { CreditCard, Building2 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { useCheckout } from '../../hooks/useCheckout';
 import { usePayment } from '../../hooks/usePayment';
 import { IdealBankSelector } from './IdealBankSelector';
-import { FastCheckoutButtons } from './FastCheckoutButtons';
-import { StripeCheckout } from '../payment/StripeCheckout';
 import { useNavigate } from 'react-router-dom';
 
 interface PaymentMethodsProps {
@@ -13,66 +10,44 @@ interface PaymentMethodsProps {
   onNext: () => void;
 }
 
-export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
-  const { setPaymentInfo } = useCheckout();
+export function PaymentMethods({ onBack }: PaymentMethodsProps) {
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'ideal' | ''>('');
   const [selectedBank, setSelectedBank] = useState('');
-  const [cardInfo, setCardInfo] = useState({ number: '', expiry: '', cvc: '' });
-  const { clientSecret, isLoading, error, initializePayment } = usePayment();
+  const { initializePayment, isLoading, error } = usePayment();
+  const navigate = useNavigate(); // For navigation
 
-    const navigate = useNavigate();
-  
-    const handleStripeCheckout = () => {
-      navigate("/pay/checkout");
-    };
-  
-
-  const handleMethodSelect = async (method: 'card' | 'ideal') => {
+  const handleMethodSelect = (method: 'card' | 'ideal') => {
     setSelectedMethod(method);
-    if (method === 'ideal') {
-      await initializePayment(1000, 'ideal');
-    } else if (method === 'card') {
-      await initializePayment(1000, 'card');
-    }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedMethod) return;
 
-    const paymentInfo = {
-      method: selectedMethod,
-      ...(selectedMethod === 'ideal' && { bank: selectedBank }),
-      ...(selectedMethod === 'card' && { cardInfo })
-    };
+    if (selectedMethod === 'ideal' && selectedBank) {
+      try {
+        // Initialize iDEAL payment with Stripe
+        const { paymentUrl } = await initializePayment('ideal', selectedBank);
 
-    setPaymentInfo(paymentInfo);
-    onNext();
+        // Redirect to Stripe's hosted payment page
+        window.location.href = paymentUrl;
+      } catch (err) {
+        console.error('Payment initialization failed:', err);
+      }
+    } else if (selectedMethod === 'card') {
+      // Redirect to '/pay/checkout' for credit card payment
+      navigate('/pay/checkout');
+    }
   };
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-gray-900">
-        Payment Method
-      </h2>
-
-      {/* Fast Checkout Options */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700">Quick Checkout</h3>
-        <FastCheckoutButtons onSuccess={onNext} />
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">Or pay with</span>
-        </div>
-      </div>
+      <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
 
       <div className="space-y-4">
+        <h3 className="text-sm font-medium text-gray-700">Select Payment Method</h3>
+
         {/* Credit Card Option */}
-        {/* <button
+        <button
           onClick={() => handleMethodSelect('card')}
           className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
             selectedMethod === 'card'
@@ -84,22 +59,7 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
             <CreditCard className="w-6 h-6 text-gray-600" />
             <span className="font-medium">Credit Card</span>
           </div>
-        </button> */}
-
-<button
-  onClick={() => handleStripeCheckout()}
-  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-    selectedMethod === 'card'
-      ? 'border-emerald-500 bg-emerald-50'
-      : 'border-gray-200 hover:border-emerald-200'
-  }`}
->
-  <div className="flex items-center gap-3">
-    <CreditCard className="w-6 h-6 text-gray-600" />
-    <span className="font-medium">Credit Card</span>
-  </div>
-</button>
- 
+        </button>
 
         {/* iDEAL Option */}
         <button
@@ -117,14 +77,6 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
         </button>
       </div>
 
-      {/* Payment Forms */}
-      {selectedMethod === 'card' && (
-        <StripeCheckout 
-          onSuccess={onNext}
-          onError={(error) => console.error(error)}
-        />
-      )}
-
       {selectedMethod === 'ideal' && (
         <IdealBankSelector
           selectedBank={selectedBank}
@@ -133,24 +85,17 @@ export function PaymentMethods({ onBack, onNext }: PaymentMethodsProps) {
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-lg">
-          {error}
-        </div>
+        <div className="p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>
       )}
 
       <div className="flex gap-4 pt-6">
-        <Button
-          variant="outline"
-          onClick={onBack}
-          className="flex-1"
-        >
+        <Button variant="outline" onClick={onBack} className="flex-1">
           Back
         </Button>
         <Button
           variant="primary"
           onClick={handleSubmit}
-          disabled={!selectedMethod || 
-            (selectedMethod === 'ideal' && !selectedBank)}
+          disabled={!selectedMethod || (selectedMethod === 'ideal' && !selectedBank)}
           loading={isLoading}
           className="flex-1"
         >

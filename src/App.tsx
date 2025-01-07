@@ -92,6 +92,8 @@ import Footer from './components/Footer'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import Checkout from './pages/payment/Checkout';
+import { CheckoutSuccess } from './pages/checkout/CheckoutSuccess'
+import { CheckoutCancel } from './pages/checkout/CheckoutCancel'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '')
 
@@ -119,6 +121,8 @@ export default function App() {
               }
             />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            <Route path="/checkout/fail" element={<CheckoutCancel />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/sell" element={<SellToUs />} />
             <Route path="/blog" element={<BlogPage />} />
