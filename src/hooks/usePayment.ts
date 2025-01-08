@@ -18,6 +18,8 @@ export function usePayment() {
       bankId,
     };
 
+    console.log(dataPass, items);
+
     try {
       const response = await fetch(`${BASE_URL}/api/payment/initialize`, {
         method: "POST",
@@ -38,6 +40,7 @@ export function usePayment() {
       }
       setIsLoading(false);
     } catch (err: any) {
+      console.log(err.message);
       setIsLoading(false);
       setError(err.message || "Something went wrong");
       navigate("/checkout/fail"); // Navigate to failure page on error
