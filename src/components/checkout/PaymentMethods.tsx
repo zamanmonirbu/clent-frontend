@@ -37,7 +37,6 @@ export function PaymentMethods({ onBack }: PaymentMethodsProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
 
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-gray-700">

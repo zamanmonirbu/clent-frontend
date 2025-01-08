@@ -10,12 +10,45 @@ const idealBanks = [
   { id: "ing", name: "ING", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8UyXKdO0tg8P2yNQR4GA7MuXrJyKBahAiNg&s" },
   { id: "abn", name: "ABN AMRO", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAGSouxoo2C7lnAmouNdDBCMTNsD91LAb_xw&s" },
   { id: "rabobank", name: "Rabobank", logo: "https://upload.wikimedia.org/wikipedia/en/5/54/Rabobank_logo.svg" },
-  { id: "asn", name: "ASN Bank", logo: "https://www.asnbank.nl/web/file?uuid=06f6e40f-9d9e-4b52-9f7a-9f7af46f58d2" },
-  { id: "sns", name: "SNS Bank", logo: "https://www.snsbank.nl/content/dam/sns/logos/sns-logo.png" },
-  { id: "bunq", name: "bunq", logo: "https://www.bunq.com/assets/images/bunq-logo.svg" },
-  { id: "knab", name: "Knab", logo: "https://www.knab.nl/content/knab/nl/_jcr_content/root/header/logo.img.png" },
-  { id: "revolut", name: "Revolut", logo: "https://www.revolut.com/icons/icon-512x512.png" },
+  { id: "asn", name: "ASN Bank", logo: "https://www.ecobusiness.fund/fileadmin/_processed_/6/c/csm_2017_07_ASN_Bank_logo_ef9949a5c3.png" },
+  { id: "sns", name: "SNS Bank", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgJesb2AILerOWRKlncyBFRquouIV7mSvJ1Q&s" },
+  { id: "bunq", name: "bunq", logo: "https://logowik.com/content/uploads/images/bunq6945.jpg" },
+  { id: "knab", name: "Knab", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFcX8iPCR9zWAteG71dJBeGKEpRtdngl1KTg&s" },
+  { id: "revolut", name: "Revolut", logo: "https://fintech.svetidej.com/images/stories/stran/600x315/revolut-logo.png" },
+  {
+    id: "VanLanschotKempen",
+   name: "Van Lanschot Kempen",
+    logo: "https://www.banken.nl/profile/media/van-lanschot-kempen-spotlight-2022-09-01-141233637.png"
+  },
+  {
+    id: "Yoursafe",
+   name: "Yoursafe",
+    logo: "https://www.yoursafe.com/images.v2/logo-yoursafe-small.png"
+  },
+  {
+    id: "N26",
+   name: "N26",
+    logo: "https://images.ctfassets.net/q33z48p65a6w/42Hvr3OYJgxAEdzoB2quix/83aedba1d73629c9953b615197915ac6/N26_Newsroom___N26_Logo_Thumbnail.png?fit=thumb&fm=png&q=80&w=600 "
+  },
+  {
+    id: "Nationale-Nederlanden",
+   name: "Nationale-Nederlanden",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROjIqsLtjmUjXIV1Pz9YW0iWAIc8Q79-WH4g&s"
+  },
+  {
+    id: "RegioBank",
+   name: "RegioBank",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3h4jVxXkbabmXOBiftYhyocXRSiatfYR6Mw&s"
+  },
+  {
+    id: "Triodos Bank",
+   name: "Triodos Bank",
+    logo: "https://banner2.cleanpng.com/20180601/syv/kisspng-triodos-bank-uk-european-investment-bank-bank-5b118cad18f103.8751841615278767811022.jpg"
+  }
+  
 ];
+
+
 
 export function IdealBankSelector({ selectedBank, onBankSelect }: IdealBankSelectorProps) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -44,7 +77,10 @@ export function IdealBankSelector({ selectedBank, onBankSelect }: IdealBankSelec
         <FaChevronDown className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500" /> {/* Dropdown Icon */}
 
         {showDropdown && (
-          <div className="absolute mt-2 w-full bg-white border rounded-lg shadow-lg z-10">
+          <div
+            className="absolute mt-2 w-full bg-white border rounded-lg shadow-lg z-10 overflow-y-auto"
+            style={{ maxHeight: "200px" }} // Set a fixed max height for scrolling
+          >
             {(searchTerm ? filteredBanks : idealBanks).map((bank) => (
               <button
                 key={bank.id}
