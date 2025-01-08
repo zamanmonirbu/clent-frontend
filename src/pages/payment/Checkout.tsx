@@ -18,6 +18,7 @@ const Checkout = () => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
+  
 
   const [nameOnCard, setNameOnCard] = useState("");
   const [loading, setLoading] = useState(false);
