@@ -6,10 +6,12 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from "@stripe/react-stripe-js";
+
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
 import cart from '../../components/image/paymnt.png'
+import { BASE_URL } from "../../api/baseUrl";
 
 const Checkout = () => {
   const { items } = useCart();
@@ -27,7 +29,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/payment/create-payment-intent", {
+      const response = await fetch(`${BASE_URL}/api/payment/create-payment-intent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
