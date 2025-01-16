@@ -10,6 +10,9 @@ interface PaymentMethodsProps {
 }
 
 export function PaymentMethods({ onBack }: PaymentMethodsProps) {
+
+
+
   const [selectedMethod, setSelectedMethod] = useState<"card" | "ideal" | "">(
     ""
   ); // Payment method state
@@ -21,23 +24,22 @@ export function PaymentMethods({ onBack }: PaymentMethodsProps) {
     setSelectedMethod(method);
   };
 
-  // Handle form submission
+  console.log(selectedBank,selectedBank);
+
+
   const handleSubmit = async () => {
     if (!selectedMethod) return;
-
-    if (selectedMethod === "ideal" && selectedBank) {
-      try {
-        const { paymentUrl } = await initializePayment("ideal", selectedBank);
-        window.location.href = paymentUrl;
-      } catch (err) {
-        console.error("Payment initialization failed:", err);
-      }
+  
+    try {
+      await initializePayment(selectedMethod, selectedBank); // Navigation handled in the hook
+    } catch (err) {
+      console.error("Payment failed:", err);
     }
   };
+  
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
 
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-gray-700">

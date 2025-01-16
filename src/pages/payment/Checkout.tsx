@@ -6,16 +6,19 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from "@stripe/react-stripe-js";
+
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
 import cart from '../../components/image/paymnt.png'
+import { BASE_URL } from "../../api/baseUrl";
 
 const Checkout = () => {
   const { items } = useCart();
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
+  
 
   const [nameOnCard, setNameOnCard] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +30,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/payment/create-payment-intent", {
+      const response = await fetch(`${BASE_URL}/api/payment/create-payment-intent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
@@ -57,18 +60,14 @@ const Checkout = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100">
-      <div className="flex w-full max-w-full gap-6">
-        {/* Payment Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="w-full bg-white rounded-lg shadow-lg p-6 flex flex-col"
-        >
+    <div className="flex flex-col items-center justify-center bg-gray-100 px-4 py-8">
+      <div className="w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name on Card */}
-          <label className="block ">
-            <span className="block text-sm font-medium text-gray-700 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Name on Card
-            </span>
+            </label>
             <input
               type="text"
               placeholder="John Doe"
@@ -77,15 +76,13 @@ const Checkout = () => {
               className="w-full border border-gray-300 rounded-md shadow-sm p-3 bg-white focus:ring-blue-500 focus:border-blue-500"
               required
             />
-          </label>
-
-         
+          </div>
 
           {/* Card Number */}
-          <label className="block mb-4 mt-6">
-            <span className="block text-sm font-medium text-gray-700 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Card Number
-            </span>
+            </label>
             <div className="border border-gray-300 rounded-md p-2">
               <CardNumberElement
                 options={{
@@ -101,23 +98,19 @@ const Checkout = () => {
                 }}
               />
             </div>
-             {/* Payment Image */}
-          <div className="flex justify-start">
-            <img
-              src={cart} // Replace with your image URL
-              alt="Payment Methods"
-              className="h-10"
-            />
+            {/* Payment Image */}
+            <div className="mt-2">
+              <img src={cart} alt="Payment Methods" className="h-10" />
+            </div>
           </div>
-          </label>
 
           {/* Expiry Date and CVC in two columns */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Expiry Date */}
-            <label className="block">
-              <span className="block text-sm font-medium text-gray-700 mb-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Expiry Date (MM/YY)
-              </span>
+              </label>
               <div className="border border-gray-300 rounded-md p-2">
                 <CardExpiryElement
                   options={{
@@ -133,13 +126,13 @@ const Checkout = () => {
                   }}
                 />
               </div>
-            </label>
+            </div>
 
             {/* CVC */}
-            <label className="block">
-              <span className="block text-sm font-medium text-gray-700 mb-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 CVC
-              </span>
+              </label>
               <div className="border border-gray-300 rounded-md p-2">
                 <CardCvcElement
                   options={{
@@ -155,14 +148,14 @@ const Checkout = () => {
                   }}
                 />
               </div>
-            </label>
+            </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading || !stripe}
-            className="w-full mt-6 py-3 bg-green-400 hover:bg-green-600 text-white font-bold rounded-lg  transition duration-200 shadow-md"
+            className="w-full mt-6 py-3 bg-green-400 hover:bg-green-600 text-white font-bold rounded-lg transition duration-200 shadow-md"
           >
             {loading ? "Processing..." : "Pay Now"}
           </button>

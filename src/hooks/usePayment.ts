@@ -1,81 +1,52 @@
 import { useState } from "react";
 import { useCart } from "./useCart";
-import {BASE_URL} from '../api/baseUrl'
+import { BASE_URL } from "../api/baseUrl";
+import { useNavigate } from "react-router-dom";
+
 export function usePayment() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const { items } = useCart();
-  
+  const { items } = useCart();
+  const navigate = useNavigate();
 
-  const initializePayment = async (method: 'ideal' | 'card', bankId?: string) => {
+  const initializePayment = async (method: "ideal" | "card", bankId?: string) => {
     setIsLoading(true);
     setError(null);
 
-    const dataPass={
-      method, bankId
+    const dataPass = {
+      method,
+      bankId,
     };
+
+    console.log(dataPass, items);
 
     try {
       const response = await fetch(`${BASE_URL}/api/payment/initialize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({dataPass,items}),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataPass, items }),
       });
 
-      if (!response.ok) throw new Error('Failed to initialize payment');
+      if (!response.ok) throw new Error("Failed to initialize payment");
+
       const data = await response.json();
 
+      if (data.paymentUrl) {
+        // Navigate to external payment gateway
+        window.location.href = data.paymentUrl;
+      } else {
+        // Handle in-app payment (e.g., card payment)
+        navigate("/checkout/success");
+      }
       setIsLoading(false);
-      return data; // { paymentUrl: "https://checkout.stripe.com/..." }
     } catch (err: any) {
-      console.log(err.message)
+      console.log(err.message);
       setIsLoading(false);
-      setError(err.message || 'Something went wrong');
+      setError(err.message || "Something went wrong");
+      navigate("/checkout/fail"); // Navigate to failure page on error
       throw err;
     }
   };
 
   return { initializePayment, isLoading, error };
 }
-
-
-// import { useState } from 'react';
-// import { createPaymentIntent } from '../utils/stripe';
-
-// interface UsePaymentOptions {
-//   onSuccess?: () => void;
-//   onError?: (error: string) => void;
-// }
-
-// export function usePayment(options: UsePaymentOptions = {}) {
-//   const [clientSecret, setClientSecret] = useState<string>('');
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   const initializePayment = async (amount: number, paymentMethod: 'ideal' | 'card' = 'card') => {
-//     setIsLoading(true);
-//     setError(null);
-
-//     try {
-//       const { clientSecret } = await createPaymentIntent({
-//         amount,
-//         paymentMethod
-//       });
-//       setClientSecret(clientSecret);
-//       options.onSuccess?.();
-//     } catch (err) {
-//       const errorMessage = err instanceof Error ? err.message : 'Payment initialization failed';
-//       setError(errorMessage);
-//       options.onError?.(errorMessage);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return {
-//     clientSecret,
-//     isLoading,
-//     error,
-//     initializePayment,
-//   };
-// }
